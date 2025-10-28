@@ -10,7 +10,7 @@ Each stakeholder performs different functions listed in the next section.
 ## Primary Actors
 
 | Actor | Description |
-| :--- | :--- | :---
+| :--- | :--- |
 | Student (S) | End users who query academic and campus information. |
 |Lecturer (L) | Provide course-related content and respond to academic queries |
 |Administrator (A) | Maintain institutional data, integrations, and policies. |
