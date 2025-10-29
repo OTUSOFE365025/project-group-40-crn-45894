@@ -1,5 +1,7 @@
 # System Constraints
 
+> Constraints = limitations/restrictions that narrow design choices
+
 | ID  | Constraint (verbatim/near-verbatim) |
 |-----|---|
 | R3  | Integrate with existing data sources (registration, LMS, calendars). |
