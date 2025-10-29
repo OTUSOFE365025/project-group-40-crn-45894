@@ -75,3 +75,6 @@ Each stakeholder performs different functions listed in the next section.
 | Postconditions | Update deployed without error. |
 | Alternative Sequence | If error occurs during deployment, roll back changes and notify maintainer of error. |
 | Related Requirements | R7, RA6, RM1, RM2, RM6, RM7 |
+
+## Use Case Diagram
+![AIDAP Use Case Diagram](images/use_case_diagram.png)
