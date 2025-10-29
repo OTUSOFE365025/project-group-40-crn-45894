@@ -76,7 +76,7 @@ Each stakeholder performs different functions listed in the next section.
 | Alternative Sequence | If error occurs during deployment, roll back changes and notify maintainer of error. |
 | Related Requirements | R7, RA6, RM1, RM2, RM6, RM7 |
 
-## Main Use Cases (FCAPS Table Style)
+## Main Use Cases (FCAPS Style)
 
 | Use Case ID & Name | Description | Related Requirements |
 | :--- | :--- | :--- |
