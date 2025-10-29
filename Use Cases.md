@@ -76,5 +76,16 @@ Each stakeholder performs different functions listed in the next section.
 | Alternative Sequence | If error occurs during deployment, roll back changes and notify maintainer of error. |
 | Related Requirements | R7, RA6, RM1, RM2, RM6, RM7 |
 
+## Main Use Cases (FCAPS Table Style)
+
+| Use Case ID & Name | Description | Related Requirements |
+| :--- | :--- | :--- |
+| **UC-1: Query Academic Information** | Student asks questions about grades, deadlines, or exam dates using chat or voice. System interprets the query via AI, retrieves live data from LMS/Registration/Calendar [R1, R3, R5, R6], enforces SSO and per-user isolation [RS7, RS8], logs the interaction for personalization, and returns answers within ≤2s [RS10]. Fallback or clarification provided if data is missing [RS13]. | R1, R3, R5, R6, RS1, RS7, RS8, RS10, RS13 |
+| **UC-2: Receive Notifications and Alerts** | Student receives notifications for deadlines, schedule changes, and announcements based on configured preferences [R1, R3]. Notifications are delivered via chat or voice, acknowledgment is recorded [RS2, RS6], and alerts are queued to meet performance targets [RS9, RS10]. | R1, R3, RS2, RS6, RS9, RS10 |
+| **UC-3: Publish Course Materials and Announcements** | Lecturer issues commands to upload or update course content and release announcements [R1, R3, RL1, RL2]. System verifies authorization [RL8], synchronizes updates with LMS, and notifies students automatically. | R1, R3, RL1, RL2, RL8 |
+| **UC-4: Track System Analytics** | Administrator requests dashboards to monitor usage, performance, and system health [RA4, RA6, RM2, RM4]. System retrieves logs and metrics, visualizes key indicators, and securely stores reports. | RA4, RA6, RM2, RM4 |
+| **UC-5: Do Maintenance and Deployment** | System Maintainer triggers automated deployment pipelines to push updates [R7, RA6, RM1, RM2]. System authorizes actions, deploys new versions to the cloud, monitors uptime, latency, and errors, and logs metrics for review [RM6, RM7]. If deployment fails, rollback occurs and maintainer is notified. | R7, RA6, RM1, RM2, RM6, RM7 |
+
+
 ## Use Case Diagram
 ![AIDAP Use Case Diagram](images/use_case_diagram.png)
