@@ -26,4 +26,52 @@ Each stakeholder performs different functions listed in the next section.
 | Actor | Student |
 | Goal | Retrieve academic information such as exam dates, grades, or deadlines. |
 | Preconditions | Student should be authenticated through institutional SSO. |
-| Main Flow | 
+| Basic Sequence | 1. Student uses the chat or voice feature to ask a question. <br> 2. AI model interprets the query. <br> 3. System retrieves answer from LMS or database. <br> 4. Response is shown in chat with accurate and contextual information. |
+| Postconditions | Query and response logged for analytics and personalization. |
+| Alternative Sequence | At step 3, if necessary information is not available, system provides fallback info or prompts for clarification. |
+| Related Requirements | R1, R3, R5, R6, RS1, RS8, RS10 |
+
+### Use Case 2: Receive Notifications and Alerts
+
+| Field | Description |
+| :--- | :--- |
+| Actor | Student |
+| Goal | Receive notifications for deadlines, schedule changes, and announcements. |
+| Preconditions | Student has configured notifications. |
+| Basic Sequence | 1. System triggered by new event or announcement. <br> 2. Assistant sends a message. <br> 3. Student acknowledges or dismisses the notification. |
+| Postconditions | User receives notification and notification is logged |
+| Related Requirements | R1, R3, RS2, RS6, RS9, RS10 |
+
+### Use Case 3: Publish Course Materials and Announcements
+
+| Field | Description |
+| :--- | :--- |
+| Actor | Lecturer |
+| Goal | Upload/update course content and release announcements. |
+| Preconditions | Lecturer is authenticated and has permissions. |
+| Basic Sequence | 1. Lecturer issues a command. <br> 2. System checks permissions and authorizes. <br> 3. New data uploaded and synchronized with LMS. <br> 4. Students receive a notification. |
+| Postconditions | Course data in linked systems updated. |
+| Related Requirements | R1, R3, RL1, RL2, RL8 |
+
+### Use Case 4: Track System Analytics
+
+| Field | Description |
+| :--- | :--- |
+| Actor | Administrator |
+| Goal | Track metrics (usage, performance, and system health). |
+| Preconditions | Administrator is authenticated and has permissions. |
+| Basic Sequence | 1. Administrator requests analytics. <br> 2. System checks permissions and authorizes. <br> 3. System retrieves usuage data and performance logs. |
+| Postconditions | Reports generated, displayed, and stored securely. |
+| Related Requirements | RA4, RA6, RM2, RM4 |
+
+### Use Case 5: Do Maintenance and Deployment
+
+| Field | Description |
+| :--- | :--- |
+| Actor | System Maintainer |
+| Goal | Push updates and monitor uptime. |
+| Preconditions | Maintainer is authenticated and has permissions. |
+| Basic Sequence | 1. Maintainer issues deployment. <br> 2. System checks permissions and authorizes. <br> 3. Deploys new version to cloud. <br> 4. System monitors performance and logs for review. |
+| Postconditions | Update deployed without error. |
+| Alternative Sequence | If error occurs during deployment, roll back changes and notify maintainer of error. |
+| Related Requirements | R7, RA6, RM1, RM2, RM6, RM7 |
