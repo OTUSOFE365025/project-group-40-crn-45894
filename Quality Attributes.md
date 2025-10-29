@@ -1,7 +1,7 @@
 # Quality Attributes
 
 | **ID** | **Name** | **Description** | **Related Requirements** |
-|:---:|:---|:---|:---|
+|:---|:---|:---|:---|
 | QA-1 | Performance | The system delivers conversational responses within ≤2 seconds on average under normal load. Latency is monitored and optimized through scalable AI processing. | RS10, RM2, RM4 |
 | QA-2 | Availability | Maintains ≥99.5% uptime monthly through high-availability cloud deployment, automatic failover, and scheduled backups. | RS11, RA6, RM1 |
 | QA-3 | Scalability | Supports up to 5,000 concurrent users using elastic cloud infrastructure that auto-scales based on system load. | RA7, R7 |
