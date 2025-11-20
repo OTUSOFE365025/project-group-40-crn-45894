@@ -2,26 +2,26 @@ Include in this file the 7 steps for Iteration 1
 
 This iteration decomposes the entire AIDAP system into major components/layers to satisfy the drivers from Deliverable 1.
 
-Step 1:
+# Step 1:
 Element name: AIDAP System (overall platform)
 
-Responsibilities (from Deliverable 1):
+Responsibilities:
 AIDAP provides a conversational interface for students, lecturers, administrators, and maintainers to access, manage, and disseminate academic and administrative information. It must:
 
 - Allow students to query academic info (exam dates, grades, deadlines, announcements) via chat/voice.
 
 - Send proactive notifications and alerts (deadlines, schedule changes, announcements).
 
-- - Let lecturers publish course materials and announcements, synced with LMS/registration.
+- Let lecturers publish course materials and announcements, synced with LMS/registration.
 
 - Provide administrators with system analytics (usage, performance, health).
 
 - Support maintainers in deployment, monitoring, uptime, and zero-downtime updates.
 
-Step 2: Architectural Drivers 
+# Step 2: Architectural Drivers 
 
-2.1: Primary Use Cases
-    UC-1: Query Academic Information
+## 2.1: Primary Use Cases
+    ### UC-1: Query Academic Information
 
         - Actor: Student
 
@@ -39,7 +39,7 @@ Step 2: Architectural Drivers
 
         - Related requirements: R1, R3, R5, R6, RS1, RS7, RS8, RS10, RS13
 
-    UC-2: Receive Notifications and Alerts
+    ### UC-2: Receive Notifications and Alerts
 
         - Actor: Student
 
@@ -55,9 +55,9 @@ Step 2: Architectural Drivers
 
         - Related requirements: R1, R3, RS2, RS6, RS9, RS10
 
-    UC-3: Publish Course Materials and Announcements
+    ### UC-3: Publish Course Materials and Announcements
 
-    Actor: Lecturer
+        - Actor: Lecturer
 
         - Goal: Upload/update course content and issue announcements via AIDAP.
 
@@ -73,7 +73,7 @@ Step 2: Architectural Drivers
 
         - Related requirements: R1, R3, RL1, RL2, RL8
 
-    UC-4: Track System Analytics
+    ### UC-4: Track System Analytics
 
         Actor: Administrator
 
@@ -81,7 +81,7 @@ Step 2: Architectural Drivers
 
         Related requirements: RA4, RA6, RM2, RM4
 
-    UC-5: Do Maintenance and Deployment
+    ### UC-5: Do Maintenance and Deployment
 
         Actor: System Maintainer
 
