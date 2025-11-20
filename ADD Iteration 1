@@ -1,1 +1,90 @@
 Include in this file the 7 steps for Iteration 1
+
+This iteration decomposes the entire AIDAP system into major components/layers to satisfy the drivers from Deliverable 1.
+
+Step 1:
+Element name: AIDAP System (overall platform)
+
+Responsibilities (from Deliverable 1):
+AIDAP provides a conversational interface for students, lecturers, administrators, and maintainers to access, manage, and disseminate academic and administrative information. It must:
+
+- Allow students to query academic info (exam dates, grades, deadlines, announcements) via chat/voice.
+
+- Send proactive notifications and alerts (deadlines, schedule changes, announcements).
+
+- - Let lecturers publish course materials and announcements, synced with LMS/registration.
+
+- Provide administrators with system analytics (usage, performance, health).
+
+- Support maintainers in deployment, monitoring, uptime, and zero-downtime updates.
+
+Step 2: Architectural Drivers 
+
+2.1: Primary Use Cases
+    UC-1: Query Academic Information
+
+        - Actor: Student
+
+        - Goal: Ask questions about grades, deadlines, or exam dates via chat/voice; get accurate contextual answers.
+
+        - Key steps:
+
+            1. Student asks a question in chat/voice.
+
+            2. AI interprets the query.
+
+            3. System retrieves data from LMS/registration/database.
+
+            4. Answer is shown with accurate context.
+
+        - Related requirements: R1, R3, R5, R6, RS1, RS7, RS8, RS10, RS13
+
+    UC-2: Receive Notifications and Alerts
+
+        - Actor: Student
+
+        - Goal: Receive deadline reminders, schedule changes, and announcements.
+
+        - Key steps:
+
+            1. System is triggered by new event/announcement.
+
+            2. Assistant sends a notification (chat/voice).
+
+            3 Student acknowledges/dismisses.
+
+        - Related requirements: R1, R3, RS2, RS6, RS9, RS10
+
+    UC-3: Publish Course Materials and Announcements
+
+    Actor: Lecturer
+
+        - Goal: Upload/update course content and issue announcements via AIDAP.
+
+        - Key steps:
+
+            1. Lecturer issues a command (e.g., “upload slides”, “post announcement”).
+
+            2. System checks permissions and authorizes.
+
+            3. Data is synchronized with LMS.
+
+            4. Students are notified.
+
+        - Related requirements: R1, R3, RL1, RL2, RL8
+
+    UC-4: Track System Analytics
+
+        Actor: Administrator
+
+        Goal: View usage/performance/health analytics.
+
+        Related requirements: RA4, RA6, RM2, RM4
+
+    UC-5: Do Maintenance and Deployment
+
+        Actor: System Maintainer
+
+        Goal: Push updates and monitor uptime with rollback on failure.
+
+        Related requirements: R7, RA6, RM1, RM2, RM6, RM7
