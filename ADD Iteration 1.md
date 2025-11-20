@@ -303,33 +303,20 @@ AIDAP provides a conversational interface for students, lecturers, administrator
 # Step 7: Evaluation & Rationale (How This Satisfies the Drivers)
 
     - Supports primary use cases (UC-1 to UC-5):
-
         - Conversation Orchestrator + NLP / AI Adapter + Integration Layer directly implement UC-1.
-
         - Notification Service + Calendar/Email Adapters implement UC-2.
-
         - Content / Lecturer Service + LMS/Registration Adapters implement UC-3.
-
         - Analytics & Reporting Service + Monitoring & Metrics Store implement UC-4.
-
         - Maintenance / Ops Console + CI/CD integration support UC-5.
 
     - Meets quality attributes:
-
         - Performance & Scalability (QA-1, QA-3): stateless services, API gateway, and cloud-native scaling.
-
         - Availability & Reliability (QA-2, QA-7): redundancy, backups, and graceful handling of upstream failures.
-
         - Security (QA-4): SSO, RBAC, and encryption enforced at the gateway and within services.
-
         - Maintainability (QA-6): modular services and clear layering support continuous deployment and localized changes.
-
         - Personalization (QA-8): User Profile Store and Conversation History Store enable adaptive responses and targeted notifications.
 
     - Respects constraints (FCAPS):
-
         - Integrates with LMS, registration, calendar, and email via adapters.
-
         - Uses standard APIs, cloud-native deployment, and centralized monitoring.
-
         - Implements accounting, performance, and security constraints explicitly in the architecture.
