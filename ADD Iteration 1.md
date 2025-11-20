@@ -22,14 +22,11 @@ AIDAP provides a conversational interface for students, lecturers, administrator
         - Actor: Student
         - Goal: Ask questions about grades, deadlines, or exam dates via chat/voice; get accurate contextual answers.
         - Key steps:
-
             1. Student asks a question in chat/voice.
-
             2. AI interprets the query.
-
             3. System retrieves data from LMS/registration/database.
-
             4. Answer is shown with accurate context.
+            
         - Related requirements: R1, R3, R5, R6, RS1, RS7, RS8, RS10, RS13
 
     UC-2: Receive Notifications and Alerts
@@ -37,12 +34,10 @@ AIDAP provides a conversational interface for students, lecturers, administrator
         - Actor: Student
         - Goal: Receive deadline reminders, schedule changes, and announcements.
         - Key steps:
-
             1. System is triggered by new event/announcement.
-
             2. Assistant sends a notification (chat/voice).
-
             3 Student acknowledges/dismisses.
+
         - Related requirements: R1, R3, RS2, RS6, RS9, RS10
 
     UC-3: Publish Course Materials and Announcements
@@ -50,14 +45,11 @@ AIDAP provides a conversational interface for students, lecturers, administrator
         - Actor: Lecturer
         - Goal: Upload/update course content and issue announcements via AIDAP.
         - Key steps:
-
             1. Lecturer issues a command (e.g., “upload slides”, “post announcement”).
-
             2. System checks permissions and authorizes.
-
             3. Data is synchronized with LMS.
-
             4. Students are notified.
+
         - Related requirements: R1, R3, RL1, RL2, RL8
 
     UC-4: Track System Analytics
@@ -176,27 +168,18 @@ AIDAP provides a conversational interface for students, lecturers, administrator
     Architecture style:
 
         - The AIDAP system uses a cloud-native, layered, service-oriented architecture with:
-
             - A Presentation / Channel Layer for web, mobile, and voice clients.
-
             - An API Gateway / Edge Layer as a single secure entry point.
-
             - An Application Services Layer for conversational logic, notifications, content management, analytics, and ops.
-
             - An Integration Layer with adapters for LMS, registration, calendar, and email.
-
             - A Data & Infrastructure Layer for profiles, conversations, configuration, metrics, and backups.
 
     Rationale (how it supports the drivers):
 
         - Separating layers improves maintainability and modifiability (QA-6) and isolates concerns.
-
         - A service-oriented core and adapters support integration constraints and extensibility (R3, RD1–RD4, RM5).
-
         - Stateless services behind an API gateway enable scalability and performance (QA-1, QA-3, RS10, RA7).
-
         - API gateway + RBAC + SSO provide a clear security boundary (QA-4, RS7, RS8, RL8, R8, RA5, RM7).
-
         - Cloud-native deployment with redundancy and backups supports availability and fault tolerance (QA-2, QA-7, RS11, RA6, RM1, RM6).
 # Step 4: High-Level Decomposition (Layers & Components)
 ## 4.1: Presentation / Channel Layer
