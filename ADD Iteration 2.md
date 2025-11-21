@@ -147,7 +147,7 @@ At this iteration, the Application Services layer from Iteration 1 is refined by
   - Notification Service uses Email Adapter (and chat/push channels) to send alerts.
 
 
-![Core Interaction Subsystem – Iteration 2 C&C View](<images/Layers_picture_from_images.png>)
+![Core Interaction Subsystem – Iteration 2 C&C View](<images/architecture_diagram.png>)
 
 ### 5.1 Subsystem Elements Summary
 
@@ -196,7 +196,7 @@ High-level steps within this subsystem:
    - Returns `answerText` to the API Gateway, which forwards it to the Web/Mobile/Voice client for display to the student.
 
 
-![UC-1 Sequence – Core Interaction Subsystem, Iteration 2](<images/Sequence_diagram.png>)
+![UC-1 Sequence – Core Interaction Subsystem, Iteration 2](<images/sequence_diagram.png>)
 
 ---
 
