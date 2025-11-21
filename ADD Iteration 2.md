@@ -30,16 +30,17 @@ This iteration focuses on one part of the AIDAP system from Iteration 1: the Cor
         Related requirements: R1, R2, R3, RS2, RS5, RS6, RS9, RS10
 
 ## Quality Attributes (focused on this element)
-    - QA-1 – Performance & Scalability
-        The subsystem must answer most UC-1 queries and process UC-2 notification triggers in ≤ 2 seconds on average, and scale horizontally to support thousands of concurrent users.
-    - QA-2 – Reliability & Fault Tolerance
-        The subsystem must continue to operate (possibly with degraded answers) when LMS/Registration/Calendar/Email services are slow or temporarily unavailable, using retries and queues.
-    - QA-3 – Security & Privacy
-        The subsystem must respect authenticated identities and roles, avoid leaking other users’ data in responses/notifications, and log only what is allowed by privacy policies.
-    - QA-4 – Personalization
-        Responses and notifications should leverage profile and history to be context-aware (relevant courses, preferred channels, timing).
+    
+| ID   | Quality Attribute              | Description                                                                                                                                                |
+|------|--------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| QA-1 | Performance & Scalability      | The subsystem must answer most UC-1 queries and process UC-2 notification triggers in ≤ 2 seconds on average, and scale horizontally to support thousands of concurrent users. |
+| QA-2 | Reliability & Fault Tolerance  | The subsystem must continue to operate (possibly with degraded answers) when LMS/Registration/Calendar/Email services are slow or temporarily unavailable, using retries and queues. |
+| QA-3 | Security & Privacy             | The subsystem must respect authenticated identities and roles, avoid leaking other users’ data in responses/notifications, and log only what is allowed by privacy policies. |
+| QA-4 | Personalization                | Responses and notifications should leverage profile and history to be context-aware (relevant courses, preferred channels, timing).                        |
 
 ## Constraints (relevant to this element)
-    CON-1: All academic data must be accessed through the Integration Layer adapters (LMS/Registration/Calendar/Email), not directly from the subsystem.
-    CON-2: AI/NLP providers must be replaceable/configurable (model versions and keys), without changing client code.
-    CON-3: The subsystem must remain cloud-native and deployable as part of the AIDAP backend service cluster.
+| ID   | Constraint Title                        | Description                                                                                                                                    |
+|------|-----------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|
+| CON-1| Access via Integration Layer            | All academic data must be accessed through the Integration Layer adapters (LMS/Registration/Calendar/Email), not directly from the subsystem. |
+| CON-2| Replaceable AI/NLP Providers            | AI/NLP providers must be replaceable/configurable (model versions and keys), without changing client code.                                    |
+| CON-3| Cloud-Native Deployment Requirement     | The subsystem must remain cloud-native and deployable as part of the AIDAP backend service cluster.                                           |
