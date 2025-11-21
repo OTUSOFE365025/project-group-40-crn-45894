@@ -98,10 +98,11 @@ AIDAP provides a conversational interface for students, lecturers, administrator
         - Name: Usability
         - Description: The interface shall provide natural conversational interaction with support for multiple languages and cross-platform accessibility (web, mobile, and voice).
         - Related requirements: RS12, RS4, RS9
-
+![Architecture Diagram](images/architecture_diagram.png)
 
     QA-6: Maintainability
 
+![Architecture Diagram](images/sequence_diagram.png)
         - Name: Maintainability
         - Description: The system shall support continuous deployment and rollback of updates with minimal downtime for maintainers.
         - Related requirements: RM1, RM2, RM3, RM4
