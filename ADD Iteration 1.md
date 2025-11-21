@@ -326,14 +326,14 @@ AIDAP provides a conversational interface for students, lecturers, administrator
 
     - Analytics and ops components use Monitoring & Metrics Store and Config & Model Registry.
 
-![AIDAP Iteration 1 – High-Level Architecture](<images/architecture_diagram.png>)
+![AIDAP Iteration 1 – High-Level Architecture](<images/Aidap 1 - High level Arch.png>)
 
 # Step 6: Behaviour for Main Scenario (UC-1 Sequence)
 
 ## Main scenario: UC-1 – Query Academic Information
     Student asks: “When is my next exam for CPS101?”
 
-![UC-1 – Student Queries Academic Information (Sequence Diagram)](<images/sequence_diagram.png>)
+![UC-1 – Student Queries Academic Information (Sequence Diagram)](<images/Student queries UC-1 Iter1.png>)
 
 # Step 7: Evaluation & Rationale (How This Satisfies the Drivers)
 
