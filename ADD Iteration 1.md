@@ -98,11 +98,10 @@ AIDAP provides a conversational interface for students, lecturers, administrator
         - Name: Usability
         - Description: The interface shall provide natural conversational interaction with support for multiple languages and cross-platform accessibility (web, mobile, and voice).
         - Related requirements: RS12, RS4, RS9
-![Architecture Diagram](images/architecture_diagram.png)
 
     QA-6: Maintainability
 
-![Architecture Diagram](images/sequence_diagram.png)
+
         - Name: Maintainability
         - Description: The system shall support continuous deployment and rollback of updates with minimal downtime for maintainers.
         - Related requirements: RM1, RM2, RM3, RM4
@@ -327,14 +326,14 @@ AIDAP provides a conversational interface for students, lecturers, administrator
 
     - Analytics and ops components use Monitoring & Metrics Store and Config & Model Registry.
 
-![AIDAP Iteration 1 – High-Level Architecture](<images/Aidap 1 - High level Arch.png>)
+![AIDAP Iteration 1 – High-Level Architecture](<images/architecture_diagram.png>)
 
 # Step 6: Behaviour for Main Scenario (UC-1 Sequence)
 
 ## Main scenario: UC-1 – Query Academic Information
     Student asks: “When is my next exam for CPS101?”
 
-![UC-1 – Student Queries Academic Information (Sequence Diagram)](<images/Student queries UC-1 Iter1.png>)
+![UC-1 – Student Queries Academic Information (Sequence Diagram)](<images/sequence_diagram.png>)
 
 # Step 7: Evaluation & Rationale (How This Satisfies the Drivers)
 
