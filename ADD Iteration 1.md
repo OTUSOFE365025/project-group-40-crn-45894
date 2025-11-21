@@ -181,6 +181,16 @@ AIDAP provides a conversational interface for students, lecturers, administrator
         - Stateless services behind an API gateway enable scalability and performance (QA-1, QA-3, RS10, RA7).
         - API gateway + RBAC + SSO provide a clear security boundary (QA-4, RS7, RS8, RL8, R8, RA5, RM7).
         - Cloud-native deployment with redundancy and backups supports availability and fault tolerance (QA-2, QA-7, RS11, RA6, RM1, RM6).
+
+## Reference Architecture Summary
+
+| Aspect               | Choice                                                                                  |
+|----------------------|-----------------------------------------------------------------------------------------|
+| Reference Architecture | Cloud-native, service-oriented system with API Gateway and independent backend services. |
+| Architectural Pattern | Layered architecture (Presentation / Channels, API Gateway, Application Services, Integration, Data & Infrastructure). |
+| Tactics              | Encapsulation of external systems via adapters; stateless services for scaling; centralized monitoring and logging; backup and recovery. |
+| Frameworks / Platforms | To be decided; design assumes containerized deployment on a cloud platform (e.g., Kubernetes or similar). |
+
 # Step 4: High-Level Decomposition (Layers & Components)
 ## 4.1: Presentation / Channel Layer
     Components:
@@ -279,6 +289,31 @@ AIDAP provides a conversational interface for students, lecturers, administrator
         - Backup & Recovery
             - Backup jobs, snapshots, and restoration scripts for critical data stores.
 
+## 4.6: Architecture Elements Summary (Iteration 1)
+
+| Layer / Area                  | Component / Element            | Main Responsibility                                                                                     | Related Use Cases        |
+|------------------------------|--------------------------------|---------------------------------------------------------------------------------------------------------|--------------------------|
+| Presentation / Channels      | Web Chat Client                | Browser-based conversational UI; sends/receives messages through the API Gateway.                       | UC-1, UC-2, UC-3         |
+| Presentation / Channels      | Mobile App Client              | Mobile interface for chat and notifications.                                                            | UC-1, UC-2               |
+| Presentation / Channels      | Voice Assistant Connector      | Connects external voice platforms (smart speakers/voice bots) to AIDAP APIs.                            | UC-1                     |
+| API / Edge                   | AIDAP API Gateway              | Single entry point; enforces SSO/RBAC, terminates TLS, routes requests to backend services.             | UC-1…UC-5                |
+| Application Services         | Conversation Orchestrator      | Coordinates conversational flows, calls AI, gathers data from adapters, and returns answers.            | UC-1                     |
+| Application Services         | NLP / AI Adapter               | Wraps AI/NLP models for intent detection and answer generation; configurable model/provider.            | UC-1                     |
+| Application Services         | Notification Service           | Manages notifications and alerts; subscribes to events and delivers messages via channels/email.        | UC-2                     |
+| Application Services         | Content / Lecturer Service     | Handles lecturer commands to publish/update course material and announcements via LMS/registration.     | UC-3                     |
+| Application Services         | Analytics & Reporting Service  | Aggregates logs/metrics into dashboards for administrators.                                             | UC-4                     |
+| Application Services         | Maintenance / Ops Console      | Entry point for deployment, monitoring, and operational tasks, integrated with CI/CD.                   | UC-5                     |
+| Integration Layer            | LMS Adapter                    | Connects to LMS; exposes course content, assignments, and grade data through standard APIs.             | UC-1, UC-3               |
+| Integration Layer            | Registration Adapter           | Connects to registration system; exposes enrolments, timetables, and exam schedules.                   | UC-1, UC-4, UC-5         |
+| Integration Layer            | Calendar Adapter               | Connects to institutional calendar; reads/writes events such as deadlines and exam dates.              | UC-1, UC-2               |
+| Integration Layer            | Email Adapter                  | Sends email-based alerts/announcements through institutional mail servers.                              | UC-2, UC-3               |
+| Data & Infrastructure        | User Profile Store             | Stores roles, preferences, enrolments, and notification settings used for context and personalization.  | UC-1, UC-2, UC-3         |
+| Data & Infrastructure        | Conversation History Store     | Logs conversations and notifications for analytics and personalization.                                 | UC-1, UC-2, UC-4         |
+| Data & Infrastructure        | Config & Model Registry        | Stores configuration for AI model versions, API keys, and feature flags.                                | UC-5                     |
+| Data & Infrastructure        | Monitoring & Metrics Store     | Holds performance/health metrics and usage data for reporting and alerting.                             | UC-4, UC-5               |
+| Data & Infrastructure        | Backup & Recovery              | Implements backup, restore, and disaster-recovery mechanisms for critical data stores.                  | Cross-cutting (all UCs)  |
+
+
 # Step 5: Component & Connector View 
 
 ## High-level relationships:
@@ -320,3 +355,19 @@ AIDAP provides a conversational interface for students, lecturers, administrator
         - Integrates with LMS, registration, calendar, and email via adapters.
         - Uses standard APIs, cloud-native deployment, and centralized monitoring.
         - Implements accounting, performance, and security constraints explicitly in the architecture.
+
+## Driver Coverage – Iteration 1
+
+| Driver / Concern                          | Addressed? | Main Architectural Elements / Decisions Involved                                                                                 |
+|-------------------------------------------|-----------|-------------------------------------------------------------------------------------------------------------------------------|
+| UC-1: Query Academic Information          | Yes       | Web/Mobile/Voice clients, AIDAP API Gateway, Conversation Orchestrator, NLP / AI Adapter, LMS & Registration Adapters, User Profile Store, Conversation History Store. |
+| UC-2: Receive Notifications and Alerts    | Yes       | Notification Service, Calendar Adapter, Email Adapter, User Profile Store, Conversation History Store, Presentation clients.  |
+| UC-3: Publish Course Materials            | Yes       | Content / Lecturer Service, LMS Adapter, Registration Adapter, Notification Service, API Gateway.                             |
+| UC-4: Track System Analytics              | Yes       | Analytics & Reporting Service, Monitoring & Metrics Store, API Gateway (logs).                                                |
+| UC-5: Maintenance and Deployment          | Yes       | Maintenance / Ops Console, Config & Model Registry, Monitoring & Metrics Store, Backup & Recovery, cloud-native deployment.  |
+| Performance & Scalability (QA-1, QA-3)    | Yes       | Cloud-native, layered SOA; stateless services behind API Gateway; ability to scale Conversation, Notification, and adapters horizontally. |
+| Availability & Reliability (QA-2, QA-7)   | Yes       | Redundant deployment, Backup & Recovery, health monitoring, robust Integration Layer with retries and graceful degradation.   |
+| Security & Privacy (QA-4)                 | Yes       | API Gateway enforcing SSO/RBAC and TLS; role-aware access to User Profile Store; logging policies via Monitoring & Metrics.   |
+| Personalization (QA-8)                    | Yes       | Conversation Orchestrator using User Profile Store + Conversation History Store; Notification Service using preferences.      |
+| Integration Constraints (R3, RD1–RD4)     | Yes       | Dedicated Integration Layer with LMS/Registration/Calendar/Email Adapters using standard APIs and sync policies.              |
+
