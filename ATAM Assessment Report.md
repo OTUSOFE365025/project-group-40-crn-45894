@@ -5,7 +5,7 @@
 
 # 1. Introduction
 
-The Architecture Tradeoff Analysis Method (ATAM) evaluates the architectural decisions made for the AI-Powered Digital Assistant Platform (AIDAP). ATAM identifies risks, non-risks, sensitivity points, and tradeoffs related to quality attributes such as performance, security, availability, scalability, and modifiability. This report applies ATAM to the AIDAP architecture resulting from Iteration 2 (ADD), using stakeholder requirements to generate scenarios, prioritize quality attributes, analyze architectural responses, and document risks.
+For this project, the Architecture Tradeoff Analysis Method (ATAM) was used to evaluate the architectural decisions made thus far for the AI-Powered Digitial Assistant Platform (AIDAP). This report outlines the main quality drivers; the constructed archtecture model and their componenets; QA scenarios; the ATAM utility tree diagram and table; the sensitivity, tradeoff, risk assessment, and non-risk tables; and finally, the summary. The architecture diagram being analyzed comes from the decisions made from iteration 2 in the ADD process.
 
 ---
 
@@ -66,22 +66,22 @@ AIDAP uses a client-server architecture.
 # 4. Quality Attribute Scenarios
 
 ### Performance Scenario  
-A student submits a query during normal load; the system must respond within **2 seconds** on average.
+When a student enters a query during normal traffic periods; the system should in <2 seconds.
 
 ### Availability Scenario  
-If an inference node fails, the system automatically reroutes traffic and maintains **99.5% uptime**.
+If any inference node does fail, the system needs to reroute the traffic to maintain the 99.5 uptime requirement.
 
 ### Security Scenario  
-When the user logs in, the system authenticates via SSO and restricts access to their own data.
+Once the user logs in to the application, the system should authenticates using SSO and restricts access to their own info.
 
 ### Scalability Scenario  
-At **5,000 concurrent users**, the system scales horizontally without degraded performance.
+At 5,000 users, the system should autoscale horizontally without sacraficing performance.
 
 ### Modifiability Scenario  
-When maintainers deploy a new AI model version, the system updates with **zero downtime**.
+When maintainers deploy a new AI model version, the system should update without causing any downtime.
 
 ### Interoperability Scenario  
-If the LMS API is unavailable, the system retries gracefully and recovers without user disruption.
+If the LMS API is unavailable, the system catches errors and tries again.
 
 ---
 
@@ -136,9 +136,9 @@ If the LMS API is unavailable, the system retries gracefully and recovers withou
 
 | Area | Sensitivity Reason |
 |------|--------------------|
-| AI Model Latency | Complex models increase inference time |
+| AI Model Latency | Complex models/queries increase thinking time |
 | API Gateway | Bottleneck affecting availability & scalability |
-| Caching Layer | Affects performance and data freshness |
+| Caching Layer | Affects performance |
 | SSO Workflow | Impacts security and response speed |
 | Autoscaling Rules | Affect scalability and cloud cost |
 
@@ -146,9 +146,9 @@ If the LMS API is unavailable, the system retries gracefully and recovers withou
 
 | Tradeoff | Explanation |
 |----------|-------------|
-| Performance vs. Accuracy | More accurate models may exceed response time limits |
-| Caching vs. Freshness | Faster responses may return stale data |
-| Scalability vs. Cost | Autoscaling increases resource usage |
+| Performance vs. Accuracy | More accurate models may take a lot more time |
+| Caching vs. Freshness | Faster responses may return less accurate data |
+| Scalability vs. Cost | Autoscaling increases resource usage and costs |
 | Security vs. Usability | Stricter SSO flows reduce convenience |
 
 ---
@@ -157,13 +157,13 @@ If the LMS API is unavailable, the system retries gracefully and recovers withou
 
 | ID | Risk Description | Impact | Probability | Category |
 |----|------------------|--------|-------------|----------|
-| R1 | AI inference latency may exceed 2s under load | High | Medium | Performance |
-| R2 | Failover may not cover all services | High | Low | Availability |
+| R1 | Under load, AI models might need >2 seconds to provide an answer | High | Medium | Performance |
+| R2 | Failover might not cover all services | High | Low | Availability |
 | R3 | External system failures may cascade | Medium | Medium | Interoperability |
-| R4 | Model updates may cause downtime | Medium | Medium | Modifiability |
+| R4 | There may be downtime when models need to be updated | Medium | Medium | Modifiability |
 | R5 | Weak authorization may expose data | High | Low | Security |
-| R6 | Scaling to 5000 users may exceed budget | Medium | High | Scalability |
-| R7 | API gateway may become single point of failure | High | Medium | Availability |
+| R6 | Autoscaling for 5000 users can be costly | Medium | High | Scalability |
+| R7 | API gateway might become a single point of failure | High | Medium | Availability |
 
 ---
 
@@ -196,4 +196,4 @@ Model updates require reliable CI/CD and versioning.
 
 # 11. Summary
 
-The ATAM evaluation shows that AIDAP's architecture supports its performance, security, and scaling requirements. The utility tree and scenario priorities reflect clear stakeholder needs. Main risks involve AI latency, dependency on external systems, and CI/CD reliability. With strong mitigation—redundancy, optimizations, and robust deployment pipelines—AIDAP can meet institutional quality goals.
+The ATAM evaluation shows that AIDAP's architecture can handle the performance, security, and scaling requirements. The utility tree and scenario priorities show the stakeholder needs. The main risks of this architecture are AI latency, failure of external systems due to dependancy, and CI/CD reliability.
