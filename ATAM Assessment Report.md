@@ -66,7 +66,7 @@ AIDAP uses a client-server architecture.
 # 4. Quality Attribute Scenarios
 
 ### Performance Scenario  
-When a student enters a query during normal traffic periods; the system should in <2 seconds.
+When a student enters a query during normal traffic periods; the system should respond in <2 seconds.
 
 ### Availability Scenario  
 If any inference node does fail, the system needs to reroute the traffic to maintain the 99.5 uptime requirement.
