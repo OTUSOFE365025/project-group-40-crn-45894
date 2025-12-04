@@ -83,7 +83,11 @@ If the LMS API is unavailable, the system retries gracefully and recovers withou
 - Interoperability  
 - Usability  
 
-## 5.2 Utility Tree Table
+## 5.2 Utility Tree Diagram
+
+![Utility Tree Diagram](images/utility_tree.png)
+
+## 5.3 Utility Tree Table
 
 | Quality Attribute | Scenario Name | Scenario Description | Stimulus | Response | Priority (Business / Technical) |
 |------------------|---------------|----------------------|----------|----------|--------------------------------|
