@@ -220,3 +220,240 @@ The idea is to:
   - Different parts of the system (Conversation Service and Notification Service) can reuse the same engine and get the same personalized behaviour.
 
 Overall, these patterns make the Context & Personalization Subsystem easier to maintain and extend, while still satisfying the main functional and non-functional requirements from Iterations 1 and 2.
+
+
+## Step 4 – Decomposition of the Context & Personalization Subsystem
+
+In this step we break the **Context & Personalization Subsystem** into smaller internal components and explain what each one does and how they relate to Iterations 1 and 2.
+
+---
+
+### 4.1 Subcomponents and Responsibilities
+
+Below are the main subcomponents we introduce inside this subsystem.
+
+| Subcomponent                 | Main Responsibilities                                                                                               |
+|-----------------------------|----------------------------------------------------------------------------------------------------------------------|
+| Context Facade API          | Public entry point for other services (Conversation, Notification). Exposes methods like `getUserContext` and `getNotificationTargets`. |
+| ProfileRepository           | Handles all reads of user profiles, enrolments, and static preferences from the **User Profile Store**.             |
+| HistoryRepository           | Handles reads and writes of interaction history and notification logs in the **Conversation History Store**.       |
+| Preference & Policy Engine  | Applies personalization rules (channels, timing, locale) and privacy/retention policies based on configs + user data. |
+| Context Assembler           | Orchestrates calls to repositories and the engine to build the final **Context DTO** returned by `getUserContext`. |
+| Notification Target Resolver| Orchestrates the logic for `getNotificationTargets(event)` and builds the list of users + channels for notifications. |
+| Privacy Guard               | Applies data minimization and role-based filtering before anything leaves the subsystem.                            |
+| Audit & Metrics Logger      | Sends anonymized logs and metrics (latency, success/failure) to the **Monitoring & Metrics Store**.                |
+
+A quick summary of each:
+
+1. **Context Facade API**
+   - This is the “front door” of the subsystem.
+   - Called by:
+     - Conversation Service (for user context).
+     - Notification Service (for targets and preferences).
+   - It doesn’t do heavy work itself; it just validates inputs and delegates to the right internal component (Context Assembler or Notification Target Resolver).
+
+2. **ProfileRepository**
+   - Talks to the **User Profile Store**.
+   - Typical responsibilities:
+     - `loadProfile(userId)`
+     - `loadEnrolledUsers(courseId)`
+     - `loadStaticPreferences(userId)`
+   - It hides all database details (schemas, queries) from the rest of the subsystem.
+
+3. **HistoryRepository**
+   - Talks to the **Conversation History Store**.
+   - Typical responsibilities:
+     - `loadRecentInteractions(userId, limit)`
+     - `recordInteraction(userId, metadata)`
+     - `recordNotification(userId, notificationMeta)`
+   - This is where we centralize access to historical data to keep it consistent.
+
+4. **Preference & Policy Engine**
+   - The “brain” for personalization and policies.
+   - Inputs:
+     - Raw profile data (from `ProfileRepository`).
+     - Interaction history (from `HistoryRepository`).
+     - Policy and preference configs (from the Config & Model Registry).
+   - Outputs:
+     - Resolved preferences (channels, timing, locale).
+     - Flags about what data can or cannot be exposed (for Privacy Guard).
+   - This is where we check admin policies (e.g., retention limits, opt-in/out rules).
+
+5. **Context Assembler**
+   - Used mainly for **UC-1C (Provide Context for Academic Query)**.
+   - Steps (simplified):
+     1. Calls `ProfileRepository` to get basic user info and enrolments.
+     2. Calls `HistoryRepository` to get recent interactions.
+     3. Passes everything to the `Preference & Policy Engine` to resolve personalization details.
+     4. Sends the result through `Privacy Guard`.
+     5. Logs the operation via `Audit & Metrics Logger`.
+   - Returns a final `ContextDTO` to the **Context Facade API**.
+
+6. **Notification Target Resolver**
+   - Used mainly for **UC-2C (Resolve Notification Preferences & Targets)**.
+   - Steps (simplified):
+     1. Uses `ProfileRepository` to find all students enrolled in the relevant course(s).
+     2. For each user, asks the `Preference & Policy Engine` to resolve notification preferences.
+     3. Sends target data through the `Privacy Guard`.
+     4. Logs the operation via `Audit & Metrics Logger`.
+   - Returns a list of **TargetNotificationContext** objects to the **Context Facade API**.
+
+7. **Privacy Guard**
+   - Sits on the boundary of the subsystem.
+   - Before any context or target list is returned:
+     - Removes fields the caller shouldn’t see.
+     - Checks role and purpose (e.g., student vs lecturer vs admin).
+   - Helps us enforce “least privilege” and data minimization.
+
+8. **Audit & Metrics Logger**
+   - Used by both Context Assembler and Notification Target Resolver (and potentially other flows later).
+   - Logs:
+     - Operation type (e.g., `getUserContext`, `getNotificationTargets`).
+     - High-level status (success/failure).
+     - Latency/response times.
+   - Sends this information to the **Monitoring & Metrics Store** so that Admins/Maintainers can track health and performance.
+
+---
+
+### 4.2 Mapping Back to Iterations 1 and 2
+
+To show continuity with earlier iterations:
+
+- In **Iteration 1** we only had:
+  - **User Profile Store**, **Conversation History Store**, **Config & Model Registry**, and **Monitoring & Metrics** as big blocks in the Data & Infrastructure layer.
+- In **Iteration 2** we introduced:
+  - A single **Context & Personalization Service** inside the **Core Interaction Subsystem**.
+
+Now, in **Iteration 3**:
+
+- That single “Context & Personalization Service” from Iteration 2 is realized by the set of subcomponents above:
+  - `Context Facade API`
+  - `Context Assembler`
+  - `Notification Target Resolver`
+  - `ProfileRepository`
+  - `HistoryRepository`
+  - `Preference & Policy Engine`
+  - `Privacy Guard`
+  - `Audit & Metrics Logger`
+
+So, when we draw the Component & Connector (C&C) diagram for this iteration, we will show:
+
+- **From outside:**
+  - Conversation Service → Context Facade API
+  - Notification Service → Context Facade API
+
+- **Inside this subsystem:**
+  - Context Facade API → Context Assembler (for UC-1C)
+  - Context Facade API → Notification Target Resolver (for UC-2C)
+  - Orchestrators → Repositories → Data Stores
+  - Orchestrators → Preference & Policy Engine → Config & Model Registry
+  - Orchestrators → Privacy Guard → back to Facade
+  - Orchestrators → Audit & Metrics Logger → Monitoring & Metrics Store
+
+This decomposition makes it clear how the Context & Personalization Subsystem actually works internally while still matching the higher-level design from Iterations 1 and 2.
+
+## Step 5 – Component & Connector View (Context & Personalization Subsystem)
+
+Figure 5.1 shows the Component & Connector (C&C) view for the **Context & Personalization Subsystem**.  
+The diagram file is stored as: `images/Iteration 3 C&C.png`.
+
+![Context & Personalization Subsystem – Component & Connector View](<images/Iteration 3 C&C.png>)
+
+---
+
+### 5.1 Scope and Context
+
+At this level we focus only on the **Context & Personalization Subsystem** and how it connects to:
+
+- The rest of the **Core Interaction Subsystem** (Conversation Service and Notification Service).
+- The main data/infra components from Iteration 1:
+  - User Profile Store  
+  - Conversation History Store  
+  - Config & Model Registry  
+  - Monitoring & Metrics Store  
+
+In the diagram, the Core Interaction Subsystem is shown at the top, the Context & Personalization Subsystem is in the middle box, and the data stores are at the bottom.
+
+---
+
+### 5.2 External Connectors
+
+**Incoming connections (from Core Interaction):**
+
+- **Conversation Service → Context Facade API**
+  - Calls:
+    - `getUserContext(userId)`
+    - `recordInteraction(userId, metadata)`
+
+- **Notification Service → Context Facade API**
+  - Calls:
+    - `getNotificationTargets(event)`
+    - `getNotificationPreferences(userId)`
+    - `recordInteraction(userId, notificationMeta)`
+
+**Outgoing connections (to infrastructure):**
+
+- **ProfileRepository → User Profile Store**
+  - Reads:
+    - User profile data
+    - Enrolments
+    - Static preferences
+
+- **HistoryRepository → Conversation History Store**
+  - Reads:
+    - Recent interactions
+  - Writes:
+    - Interaction history
+    - Notification logs
+
+- **Preference & Policy Engine → Config & Model Registry**
+  - Reads:
+    - Privacy and retention policies
+    - Personalization configuration (default channels, feature flags, etc.)
+
+- **Audit & Metrics Logger → Monitoring & Metrics Store**
+  - Writes:
+    - Metrics for operations like `getUserContext` and `getNotificationTargets`
+    - High-level/anonymized access logs
+
+---
+
+### 5.3 Internal Components and Connectors
+
+Inside the subsystem (inside the big box in Figure 5.1), the main components and their connectors are:
+
+| From                          | To                             | Purpose                                                                                       |
+|-------------------------------|--------------------------------|-----------------------------------------------------------------------------------------------|
+| Context Facade API           | Context Assembler              | Handle `getUserContext(userId)` (UC-1C).                                                      |
+| Context Facade API           | Notification Target Resolver   | Handle `getNotificationTargets(event)` (UC-2C).                                               |
+| Context Assembler            | ProfileRepository              | Load user profile, enrolments and static preferences.                                         |
+| Context Assembler            | HistoryRepository              | Load recent interaction history for the user.                                                |
+| Context Assembler            | Preference & Policy Engine     | Ask for resolved context and personalization decisions.                                      |
+| Context Assembler            | Privacy Guard                  | Filter the final Context DTO before returning it.                                            |
+| Context Assembler            | Audit & Metrics Logger         | Log `getUserContext` latency and success/failure.                                            |
+| Notification Target Resolver | ProfileRepository              | Load all enrolled users for a course or event.                                               |
+| Notification Target Resolver | Preference & Policy Engine     | Resolve notification preferences (channels, timing, opt-in/out) for each user.               |
+| Notification Target Resolver | Privacy Guard                  | Filter the final list of targets before returning it.                                        |
+| Notification Target Resolver | Audit & Metrics Logger         | Log `getNotificationTargets` latency and success/failure.                                    |
+| HistoryRepository            | Conversation History Store     | Read/write interaction and notification history.                                             |
+| ProfileRepository            | User Profile Store             | Read user profile and enrolment data.                                                        |
+| Preference & Policy Engine   | Config & Model Registry        | Load the current set of policies and personalization rules.                                  |
+| Audit & Metrics Logger       | Monitoring & Metrics Store     | Send anonymized logs and metrics for monitoring and analytics.                               |
+
+---
+
+### 5.4 Text Description of the Diagram
+
+The typical flow in Figure 5.1 looks like this:
+
+1. A caller (Conversation Service or Notification Service) sends a request to the **Context Facade API**.
+2. The Facade delegates the request to either:
+   - **Context Assembler** (for `getUserContext`), or  
+   - **Notification Target Resolver** (for `getNotificationTargets`).
+3. The orchestrator component calls the **repositories** (`ProfileRepository`, `HistoryRepository`) to get the required data.
+4. It then calls the **Preference & Policy Engine** to apply personalization and policy rules.
+5. Before anything leaves the subsystem, the result passes through the **Privacy Guard** to enforce data minimization and role-based filtering.
+6. Throughout the process, the **Audit & Metrics Logger** records metrics and status and sends them to the Monitoring & Metrics Store.
+7. Finally, the **Context Facade API** returns the filtered result back to the caller.
+
+This C&C view shows how all the internal parts of the Context & Personalization Subsystem work together and how they connect back to the components introduced in Iterations 1 and 2.
