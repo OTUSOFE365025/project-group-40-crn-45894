@@ -12,36 +12,49 @@ The Architecture Tradeoff Analysis Method (ATAM) evaluates the architectural dec
 # 2. Business Drivers
 
 ## 2.1 Project Goals
-AIDAP aims to provide a unified conversational interface for students, lecturers, and administrators to securely access academic data. It must integrate with multiple external university systems, deliver fast and accurate AI-powered responses, and operate as a scalable cloud-native system.
+The system provides a conversational interface for students, faculty, and administrators to interact with institutional data such as course schedules, deadlines, announcements, and academic analytics. The assistant integrates with external university systems (LMS, registration, calendars, and mail) and uses AI to deliver contextual answers.
 
 ## 2.2 Primary Quality Drivers
-- **Performance** – <2 seconds response time (RS10)  
+- **Performance** – response time should be <2 seconds (RS10)  
 - **Availability** – 99.5% uptime (RS11), auto-failover (RA6)  
 - **Security & Privacy** – SSO authentication, access control, data policies (RS7, RL8, RA5)  
 - **Scalability** – up to 5,000 concurrent users (RA7)  
 - **Modifiability** – easy integration of new AI models/services (RM5, RM3)  
-- **Interoperability** – integrations with LMS, Registration, Calendar, and Email (R3, RD2)
+- **Interoperability** – integrations with LMS, Registration, Calendar, and Email (R3, RD2), and work on mobiles and the web (RS9)
 
 ---
 
-# 3. Architectural Approaches (From Iteration 2 Architecture)
+# 3. Architectural Approaches
 
-AIDAP uses a modular cloud-native architecture.
+AIDAP uses a client-server architecture.
 
 ## Architecture Diagram
 
 ![Architecture Diagram](images/architecture_diagram.png)
 
 
-## 3.1 System Decomposition
-- **Conversation Interface Layer** – chat UI, voice input, multi-device support  
-- **AI Processing Module** – NLU, intent detection, model inference  
-- **Integration Layer** – API gateway, connectors to LMS/registration/calendar  
-- **Data Management** – user profiles, logs, personalization  
-- **Notification Services** – reminders, announcements  
-- **Monitoring & Deployment** – CI/CD pipelines, logging, autoscaling  
+## 3.1 Subcomponents and Responsibilities
 
-## 3.2 Architectural Tactics
+| Subcomponent                        | Description / Responsibilities                                                                                                                                         | Layer (logical)          | Related Use Cases |
+|------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------|-------------------|
+| Conversation Service               | Main controller for UC-1. Receives `(userId, message)` from the API Gateway, retrieves user context, calls AI / NLP Adapter for intent and answer, queries Integration Layer adapters, and returns final answer. | Application Services     | UC-1              |
+| Notification Service               | Main controller for UC-2. Consumes scheduled notification jobs, determines target users and channels, and dispatches notifications via NotificationChannel strategies.                                        | Application Services     | UC-2              |
+| Event Intake & Scheduler           | Listens for events from Integration Layer (LMS/Registration/Calendar). Normalizes events, calculates when notifications should be sent, and queues jobs for Notification Service.                            | Application Services     | UC-2              |
+| Context & Personalization Service  | Provides high-level APIs to load user profiles, enrolments, preferences, and history; records interactions/notifications; centralizes personalization rules and privacy enforcement.                         | App Services (with access to Data & Infrastructure) | UC-1, UC-2        |
+| AI / NLP Adapter                   | Encapsulates calls to external AI/NLP providers. Offers `interpret(message, context)` and `generateAnswer(data, context)` and handles configuration (model versions, keys), timeouts, and errors.          | Application Services     | UC-1, UC-2 (optional for templated notifications) |
+| NotificationChannel strategies     | Interface and concrete channel implementations (ChatChannel, PushChannel, EmailChannel). Used by Notification Service to send messages through different delivery channels.                                | Application Services     | UC-2              |
+
+## 3.2 Subsystem Elements
+| Element / Component                | Key Connectors / Interactions                                                                                           |
+|-----------------------------------|-------------------------------------------------------------------------------------------------------------------------|
+| Conversation Service              | Receives queries from API Gateway; calls Context & Personalization, AI / NLP Adapter, and LMS/Registration/Calendar Adapters. |
+| Notification Service              | Receives jobs from Event Intake & Scheduler; calls Context & Personalization, NotificationChannel strategies, Email Adapter.   |
+| Event Intake & Scheduler          | Receives events from LMS/Registration/Calendar Adapters; enqueues notification jobs for Notification Service.           |
+| Context & Personalization Service | Communicates with User Profile Store and Conversation History Store; used by Conversation and Notification Services.    |
+| AI / NLP Adapter                  | Called by Conversation Service (and optionally Notification Service) to interpret queries and generate text responses.  |
+| NotificationChannel strategies    | Implement channel-specific sending (chat, push, email); used by Notification Service.                                   |
+
+## 3.3 Architectural Tactics
 - **Performance** – caching, asynchronous calls, load balancing  
 - **Availability** – redundancy, health checks, failover  
 - **Security** – OAuth SSO, RBAC, encryption  
