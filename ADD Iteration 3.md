@@ -457,3 +457,124 @@ The typical flow in Figure 5.1 looks like this:
 7. Finally, the **Context Facade API** returns the filtered result back to the caller.
 
 This C&C view shows how all the internal parts of the Context & Personalization Subsystem work together and how they connect back to the components introduced in Iterations 1 and 2.
+
+## Step 6 – Behaviour for Main Scenarios
+
+In this step we explain how the **Context & Personalization Subsystem** behaves in its two main internal use cases:
+
+- UC-1C – Provide Context for Academic Query  
+- UC-2C – Resolve Notification Preferences & Targets  
+
+We also include two sequence diagrams from the `images` folder:
+
+- `images/Iteration 3 UC-1C Sequence.png`
+- `images/Iteration 3 UC-2C Sequence.png`
+
+---
+
+### 6.1 UC-1C – Provide Context for Academic Query
+
+**Scenario summary:**  
+A student types a question like *“When is my next exam for CPS101?”* into the chat. The Conversation Service needs user-specific context (enrolments, preferences, recent activity), so it calls the Context & Personalization Subsystem.
+
+![UC-1C – Provide Context for Academic Query](images/Iteration%203%20UC-1C%20Sequence.png)
+
+**Step-by-step behaviour (from this subsystem’s point of view):**
+
+1. **Conversation Service → Context Facade API**  
+   - The Conversation Service calls `getUserContext(userId)` with the authenticated `userId`.
+
+2. **Context Facade API → Context Assembler**  
+   - The Facade does basic validation and forwards the request to `Context Assembler` using something like `buildUserContext(userId)`.
+
+3. **Context Assembler → ProfileRepository**  
+   - `Context Assembler` calls `loadProfile(userId)`.  
+   - `ProfileRepository` reads from the **User Profile Store** and returns:
+     - Basic profile data (program, year, etc.).
+     - Current course enrolments (e.g., CPS101, MATH2050).
+     - Static preferences (time zone, date format, language).
+
+4. **Context Assembler → HistoryRepository**  
+   - The assembler calls `loadRecentInteractions(userId, limit)` on `HistoryRepository`.  
+   - `HistoryRepository` reads recent interaction history from the **Conversation History Store** and returns, for example, the last few questions the student asked.
+
+5. **Context Assembler → Preference & Policy Engine**  
+   - The assembler now calls `resolveContext(profile, interactions, configRef)` on the **Preference & Policy Engine**.  
+   - The engine:
+     - Pulls policies and personalization rules from the **Config & Model Registry**.
+     - Infers a “focus course” (e.g., CPS101) based on recent activity.
+     - Applies user preferences (language, date format, etc.).
+     - Applies any high-level rules (for example, hide withdrawn courses).
+   - It returns a `resolvedContextModel` back to the assembler.
+
+6. **Context Assembler → Privacy Guard**  
+   - The assembler passes the `resolvedContextModel` to the **Privacy Guard** with the caller role (`"ConversationService"`).  
+   - The Privacy Guard removes any fields the caller does not need (internal IDs, extra flags) and returns a filtered `ContextDTO`.
+
+7. **Context Assembler → Audit & Metrics Logger**  
+   - The assembler logs the operation using `logContextLookup(userId*, latency, status)` on the **Audit & Metrics Logger**.  
+   - Only an anonymized identifier is used here (no raw personal data).
+
+8. **Context Assembler → Context Facade API → Conversation Service**  
+   - The `ContextDTO` is passed back to the **Context Facade API**, which then returns it to the **Conversation Service**.  
+   - The Conversation Service uses this context, plus data from the LMS/Registration and the AI/NLP Adapter (from Iteration 2), to build the final answer for the student.
+
+This flow shows how UC-1C supports the larger UC-1 (Query Academic Information) while still enforcing personalization and privacy rules.
+
+---
+
+### 6.2 UC-2C – Resolve Notification Preferences & Targets
+
+**Scenario summary:**  
+The LMS generates an event like *“CPS101 Assignment 2 is due in 24 hours.”* The Notification Service needs to know which students to notify and which channels to use, while respecting their notification preferences and quiet hours.
+
+![UC-2C – Resolve Notification Preferences & Targets](images/Iteration%203%20UC-2C%20Sequence.png)
+
+**Step-by-step behaviour :**
+
+1. **Notification Service → Context Facade API**  
+   - The Notification Service calls `getNotificationTargets(event)` on the **Context Facade API**, passing information such as:
+     - `courseId = CPS101`
+     - `dueDateTime`
+     - `notificationType = AssignmentReminder`.
+
+2. **Context Facade API → Notification Target Resolver**  
+   - The Facade forwards the event to the **Notification Target Resolver** using `resolveTargets(event)`.
+
+3. **Notification Target Resolver → ProfileRepository**  
+   - The resolver calls `loadEnrolledUsers(courseId)` on `ProfileRepository`.  
+   - `ProfileRepository` queries the **User Profile Store** and returns a list of `userId`s for all students currently enrolled in CPS101.
+
+4. **Notification Target Resolver → Preference & Policy Engine (loop per user)**  
+   - For each enrolled user, the resolver calls  
+     `resolveNotificationPrefs(userId, eventType, dueDateTime)` on the **Preference & Policy Engine**.
+   - The engine:
+     - Reads notification and quiet-hour policies from the **Config & Model Registry**.
+     - Looks up the user’s notification preferences (channels, opt-in/out flags, language).
+     - Uses the user’s time zone to decide if sending now is allowed (quiet hours).
+     - Returns a “decision” object that says:
+       - Which channels are allowed (chat/email/push).
+       - Whether sending now is allowed.
+       - Whether the user has opted in for this event type.
+
+5. **Notification Target Resolver – filter targets**  
+   - The resolver filters the list of users:
+     - Removes users who have opted out of this notification type.
+     - Removes users who cannot be contacted now because of quiet-hour rules.
+   - For the remaining users, it builds `TargetNotificationContext` entries with:
+     - `userId`
+     - allowed channels
+     - locale/language and any simple personalization flags.
+
+6. **Notification Target Resolver → Privacy Guard**  
+   - The resolver calls `filterTargets(targetList, callerRole="NotificationService")` on the **Privacy Guard**.  
+   - The Privacy Guard strips out any unnecessary or sensitive details so only the minimum data required to send the notifications is returned.
+
+7. **Notification Target Resolver → Audit & Metrics Logger**  
+   - The resolver logs the operation using `logTargetResolution(targetCount, latency, status)` on the **Audit & Metrics Logger**.
+
+8. **Notification Target Resolver → Context Facade API → Notification Service**  
+   - The final `filteredTargetList` is passed back to the **Context Facade API**, and then returned to the **Notification Service**.  
+   - The Notification Service then uses its notification channel strategies (from Iteration 2) to actually send the reminders via chat, email, and/or push.
+
+This flow shows how UC-2C supports UC-2 (Receive Notifications & Alerts) by figuring out **who** should be notified and **how**, while still respecting personalization and privacy requirements.
