@@ -578,3 +578,103 @@ The LMS generates an event like *“CPS101 Assignment 2 is due in 24 hours.”* 
    - The Notification Service then uses its notification channel strategies (from Iteration 2) to actually send the reminders via chat, email, and/or push.
 
 This flow shows how UC-2C supports UC-2 (Receive Notifications & Alerts) by figuring out **who** should be notified and **how**, while still respecting personalization and privacy requirements.
+
+## Step 7 – Design Decisions and Driver Coverage
+
+In this step we list the main design decisions we made for the **Context & Personalization Subsystem** in Iteration 3, and explain how they relate back to the use cases and quality attribute drivers from Iterations 1 and 2.
+
+---
+
+### 7.1 Key Design Decisions
+
+| ID   | Design Decision | Short Explanation |
+|------|-----------------|------------------|
+| D3-1 | **Use a single Context Facade API as the only entry point.** | Conversation Service and Notification Service never talk directly to repositories or engines. They always go through `Context Facade API` using methods like `getUserContext` and `getNotificationTargets`. |
+| D3-2 | **Introduce ProfileRepository and HistoryRepository as separate data access layers.** | All reads/writes to the User Profile Store and Conversation History Store are done through repository components instead of scattered queries. |
+| D3-3 | **Create a dedicated Preference & Policy Engine.** | Personalization rules (channels, timing, locale) and privacy/retention policies are evaluated in one place instead of being hard-coded across services. |
+| D3-4 | **Add a Privacy Guard on the subsystem boundary.** | Before any context or target list leaves the subsystem, it passes through Privacy Guard to enforce data minimization and role-based filtering. |
+| D3-5 | **Split orchestration into Context Assembler and Notification Target Resolver.** | UC-1C and UC-2C each get their own orchestrator component instead of one huge “god service”, which keeps logic focused and easier to reason about. |
+| D3-6 | **Log operations via an Audit & Metrics Logger.** | Every major operation (`getUserContext`, `getNotificationTargets`) records latency and status to Monitoring & Metrics so admins can track health and performance. |
+
+---
+
+#### D3-1 – Context Facade API as the only entry point
+
+- **Why we did it:**  
+  We wanted other services to see this subsystem as a simple “black box”: they just call a small set of methods and don’t care how the internals work.
+- **What it helps with:**  
+  - Makes the subsystem easier to change later without breaking Conversation or Notification Services.  
+  - Helps security: all requests come through one place, so validation and access checks are simpler.
+
+#### D3-2 – Separate repositories for profile and history data
+
+- **Why we did it:**  
+  Profile/enrolment data and interaction history have different access patterns and could end up in different storage technologies. Keeping them in two repositories matches that.
+- **What it helps with:**  
+  - Easier to tune performance separately (e.g., caching profile lookups without touching history).  
+  - If the university changes how profiles are stored, we mostly update `ProfileRepository` instead of touching the whole subsystem.
+
+#### D3-3 – Preference & Policy Engine
+
+- **Why we did it:**  
+  Personalization rules and privacy/retention policies can get complicated and will probably change over time. We didn’t want those scattered across multiple services.
+- **What it helps with:**  
+  - Keeps personalization behaviour consistent between UC-1C and UC-2C.  
+  - Makes it easier to update policies (for example, new opt-in rules) by changing one component.
+
+#### D3-4 – Privacy Guard on the boundary
+
+- **Why we did it:**  
+  We want to enforce “least privilege” and “data minimization” by default. It’s easy to accidentally leak extra fields if we don’t have a dedicated filter step.
+- **What it helps with:**  
+  - Stronger alignment with privacy requirements (R8, RA5, RA6).  
+  - Makes audits easier: we can point to one place that controls what leaves the subsystem.
+
+#### D3-5 – Separate orchestrators for UC-1C and UC-2C
+
+- **Why we did it:**  
+  The flow for building query context is not the same as the flow for resolving notification targets. Putting both into one big class/service would be messy.
+- **What it helps with:**  
+  - Clearer behaviour: Context Assembler is only about `getUserContext`, Notification Target Resolver is only about `getNotificationTargets`.  
+  - Better maintainability: changes for notifications don’t risk breaking query context, and vice versa.
+
+#### D3-6 – Audit & Metrics Logger
+
+- **Why we did it:**  
+  The project requirements talk about monitoring, analytics, and maintainability. To support that, we need structured metrics about how this subsystem behaves.
+- **What it helps with:**  
+  - Detecting performance problems (e.g., AI or database slowdowns).  
+  - Supporting admin dashboards and future ATAM-style evaluations.
+
+---
+
+### 7.2 Driver Coverage
+
+The table below shows how these decisions relate back to the main drivers (use cases, quality attributes, and constraints).
+
+| Driver / Concern | How Iteration 3 addresses it |
+|------------------|------------------------------|
+| **UC-1 – Query Academic Information (via UC-1C)** | D3-1 and D3-5 make `getUserContext` a clean operation through the Context Facade API and Context Assembler. D3-2 and D3-3 ensure profile/history data and personalization rules are handled properly so the Conversation Service always gets a useful ContextDTO. |
+| **UC-2 – Receive Notifications & Alerts (via UC-2C)** | D3-1 and D3-5 support `getNotificationTargets` through the Facade and Notification Target Resolver. D3-2 and D3-3 provide accurate, per-user channel and timing preferences. D3-4 ensures that only the minimum data needed to send notifications is returned. |
+| **QA-1 – Performance & Scalability** | D3-2 separates data access into repositories so we can optimize queries and add caching where needed. D3-1 and the stateless Facade design mean we can scale this subsystem horizontally. D3-6 provides metrics to spot performance bottlenecks. |
+| **QA-2 – Reliability & Fault Tolerance** | D3-2 makes it easier to add retries/timeouts around the repositories only. D3-6 gives visibility into failures and slow operations, which helps maintainers react quickly. Using a single Facade (D3-1) also simplifies error handling from the callers’ point of view. |
+| **QA-3 – Security & Privacy** | D3-4 (Privacy Guard) and D3-3 (policy engine) are the main decisions for this. They enforce data minimization, role-based filtering, and retention/privacy rules before data leaves the subsystem. D3-1 helps by centralizing access. |
+| **QA-4 – Personalization** | D3-3 centralizes all preference and policy logic, so both queries and notifications use the same personalization rules. D3-5 ensures each use case can apply personalization in the way that makes the most sense for that flow. |
+| **Constraints (CON-4, CON-5, CON-6)** | D3-1 and D3-2 guarantee that all access to user/profile data goes through approved stores and a stateless API. D3-3 and D3-4 ensure policy-driven privacy and retention are actually enforced inside the subsystem. |
+
+---
+
+### 7.3 Short Summary
+
+Overall, Iteration 3 takes the “Context & Personalization Service” from Iteration 2 and turns it into a small, well-structured subsystem.  
+
+The main ideas are:
+
+- One Facade in front,  
+- Repositories for data access,  
+- A central engine for personalization/policies,  
+- A Privacy Guard at the boundary,  
+- Two focused orchestrators for the main flows, and  
+- Logging for monitoring.
+
+These choices keep the subsystem aligned with the earlier architecture while making personalization and privacy much easier to manage and evolve in the future.
