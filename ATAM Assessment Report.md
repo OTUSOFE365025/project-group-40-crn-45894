@@ -28,6 +28,11 @@ AIDAP aims to provide a unified conversational interface for students, lecturers
 
 AIDAP uses a modular cloud-native architecture.
 
+## Architecture Diagram
+
+![Architecture Diagram](images/architecture_diagram.png)
+
+
 ## 3.1 System Decomposition
 - **Conversation Interface Layer** – chat UI, voice input, multi-device support  
 - **AI Processing Module** – NLU, intent detection, model inference  
