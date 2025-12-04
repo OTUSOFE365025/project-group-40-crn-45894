@@ -28,12 +28,12 @@ The system provides a conversational interface for students, faculty, and admini
 
 AIDAP uses a client-server architecture.
 
-## Architecture Diagram
+## 3.1 Architecture Diagram
 
 ![Architecture Diagram](images/architecture_diagram.png)
 
 
-## 3.1 Subcomponents and Responsibilities
+## 3.2 Subcomponents and Responsibilities
 
 | Subcomponent                        | Description / Responsibilities                                                                                                                                         | Layer (logical)          | Related Use Cases |
 |------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------|-------------------|
@@ -44,7 +44,7 @@ AIDAP uses a client-server architecture.
 | AI / NLP Adapter                   | Encapsulates calls to external AI/NLP providers. Offers `interpret(message, context)` and `generateAnswer(data, context)` and handles configuration (model versions, keys), timeouts, and errors.          | Application Services     | UC-1, UC-2 (optional for templated notifications) |
 | NotificationChannel strategies     | Interface and concrete channel implementations (ChatChannel, PushChannel, EmailChannel). Used by Notification Service to send messages through different delivery channels.                                | Application Services     | UC-2              |
 
-## 3.2 Subsystem Elements
+## 3.3 Subsystem Elements
 | Element / Component                | Key Connectors / Interactions                                                                                           |
 |-----------------------------------|-------------------------------------------------------------------------------------------------------------------------|
 | Conversation Service              | Receives queries from API Gateway; calls Context & Personalization, AI / NLP Adapter, and LMS/Registration/Calendar Adapters. |
@@ -54,7 +54,7 @@ AIDAP uses a client-server architecture.
 | AI / NLP Adapter                  | Called by Conversation Service (and optionally Notification Service) to interpret queries and generate text responses.  |
 | NotificationChannel strategies    | Implement channel-specific sending (chat, push, email); used by Notification Service.                                   |
 
-## 3.3 Architectural Tactics
+## 3.4 Architectural Tactics
 - **Performance** – caching, asynchronous calls, load balancing  
 - **Availability** – redundancy, health checks, failover  
 - **Security** – OAuth SSO, RBAC, encryption  
